@@ -6,3 +6,11 @@ Unity Libre Fracture is a free and open source fracture system developed for Uni
 It uses NVIDIA Blast wrapper for unity as base from [here](https://forum.unity.com/threads/nvidia-blast.472623) and for concave meshes uses VHACD (Volumetric Hierarchical Approximate Convex Decomposition) from [here](https://github.com/Unity-Technologies/VHACD).
 
 [YouTube Video Demonstration](https://www.youtube.com/watch?v=_vSFzkecSak)
+
+# TODO
+
+**[C]** - critical issue, **[NC]** - non-critical issue, **[F]** - feature
+
+- **[C]** Fix physical stability issue, probably related to the centers of masses (can be noticed on round objects like sphere)
+- **[F]** If FractureObject had any joints attached and it was then fractured, make corresponding joints at the chunk(s) to the same connected body
+- **[F]** Mesh deformation system
