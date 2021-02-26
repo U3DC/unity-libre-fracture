@@ -43,8 +43,9 @@ public class CEditorFracture : EditorWindow
     public int totalChunks = 5;
     public int seed = 0;
 
+    public float objectMass = 100;
     public float jointBreakForce = 1000;
-    public uint VHACDResolution = 64000000;
+    public uint VHACDResolution = 100000;
 
     //TODO: serialize
     //public SlicingConfiguration sliceConf;
@@ -81,7 +82,7 @@ public class CEditorFracture : EditorWindow
             return;
         }
 
-        if (GUILayout.Button("Clean Up Objects")) CleanUp();
+        if (GUILayout.Button("Clean Up Objects")) CleanUp(true);
 
         GUILayout.Space(20);
         source = EditorGUILayout.ObjectField("Source", source, typeof(GameObject), true) as GameObject;
@@ -98,7 +99,7 @@ public class CEditorFracture : EditorWindow
                     if (source.activeInHierarchy)
                         source.SetActive(false);
 
-                    _createPreview(GenerateType.Preview);
+                    _createObject(GenerateType.Preview);
 
                     Selection.activeGameObject = previewObject;
                 }
@@ -109,7 +110,7 @@ public class CEditorFracture : EditorWindow
                     if (source.activeInHierarchy)
                         source.SetActive(false);
 
-                    _createPreview(GenerateType.Preview);
+                    _createObject(GenerateType.Preview);
 
                     Selection.activeGameObject = previewObject;
                 }
@@ -122,7 +123,7 @@ public class CEditorFracture : EditorWindow
         insideMaterial = (Material)EditorGUILayout.ObjectField("Inside Material", insideMaterial, typeof(Material), false);
         if (EditorGUI.EndChangeCheck())
         {
-            _createPreview(GenerateType.Preview);
+            _createObject(GenerateType.Preview);
         }
 
         if (!insideMaterial) EditorGUILayout.HelpBox("If inside material is not assigned, the same material as material of selected object will be used", MessageType.Info);
@@ -130,7 +131,7 @@ public class CEditorFracture : EditorWindow
         EditorGUI.BeginChangeCheck();
         fractureType = (FractureTypes)EditorGUILayout.EnumPopup("Fracture Type", fractureType);
         if (EditorGUI.EndChangeCheck())
-            _createPreview(GenerateType.Preview);
+            _createObject(GenerateType.Preview);
 
         EditorGUILayout.BeginHorizontal();
         islands = EditorGUILayout.Toggle("Islands", islands);
@@ -146,8 +147,12 @@ public class CEditorFracture : EditorWindow
             UpdatePreview();
         }
 
-        jointBreakForce = EditorGUILayout.FloatField("Joint Break Force",jointBreakForce);
         VHACDResolution = (uint)EditorGUILayout.IntSlider(new GUIContent("VHACD Resolution"), (int)VHACDResolution, 100000, 64000000);
+
+        EditorGUILayout.Space(5);
+
+        objectMass = EditorGUILayout.FloatField("Object Mass", objectMass);
+        jointBreakForce = EditorGUILayout.FloatField("Joint Break Force", jointBreakForce);
 
         bool canCreate = false;
 
@@ -160,7 +165,7 @@ public class CEditorFracture : EditorWindow
         if (fractureType == FractureTypes.Cutout) canCreate = GUI_Cutout();
         if(EditorGUI.EndChangeCheck())
         {
-            _createPreview(GenerateType.Preview);
+            _createObject(GenerateType.Preview);
         }
 
         if (canCreate)
@@ -168,22 +173,22 @@ public class CEditorFracture : EditorWindow
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Generate"))
             {
-                _createPreview(GenerateType.Generate);
+                _createObject(GenerateType.Generate);
             }
 
             if (GUILayout.Button("Create Prefab"))
             {
-                _createPreview(GenerateType.CreateAsset);
+                _createObject(GenerateType.CreateAsset);
             }
             GUILayout.EndHorizontal();
         }
     }
 
-    private void _createPreview(GenerateType generateType)
+    private void _createObject(GenerateType generateType)
     {
         NvBlastExtUnity.setSeed(seed);
 
-        CleanUp();
+        CleanUp(false);
 
         GameObject cs = generateType == GenerateType.Preview ? new GameObject(generateType == GenerateType.Preview ? $"{source.name}{objectPostfix}Preview" : $"{source.name}{objectPostfix}") : Instantiate(source);
         if (generateType != GenerateType.Preview)
@@ -222,7 +227,8 @@ public class CEditorFracture : EditorWindow
             //ms = smr.sharedMesh;
         }
 
-        if (ms == null) return;
+        if (ms == null)
+            return;
 
         NvMesh mymesh = new NvMesh(ms.vertices, ms.normals, ms.uv, ms.vertexCount, ms.GetIndices(0), (int)ms.GetIndexCount(0));
 
@@ -302,8 +308,7 @@ public class CEditorFracture : EditorWindow
             chunk.transform.rotation = Quaternion.identity;
         }
 
-        // Connect chunk with neighbor chunks at all sides around using bounds
-        if ((generateType == GenerateType.Generate || generateType == GenerateType.CreateAsset))
+        if (generateType == GenerateType.Generate || generateType == GenerateType.CreateAsset)
         {
             cs.AddComponent<FractureObject>().jointBreakForce = jointBreakForce;
 
@@ -513,7 +518,7 @@ public class CEditorFracture : EditorWindow
     {
         NvBlastExtUnity.setSeed(seed);
 
-        CleanUp();
+        CleanUp(false);
         if (source == null) return;
 
         GameObject ps = new GameObject("POINTS");
@@ -561,8 +566,10 @@ public class CEditorFracture : EditorWindow
         ps.transform.position = source.transform.position;
     }
 
-    private void CleanUp()
+    private void CleanUp(bool enableSource)
     {
+        source.SetActive(enableSource);
+
         GameObject.DestroyImmediate(GameObject.Find("POINTS"));
         GameObject.DestroyImmediate(GameObject.Find($"{source.name}{objectPostfix}Preview"));
     }

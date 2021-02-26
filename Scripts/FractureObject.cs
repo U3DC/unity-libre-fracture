@@ -23,6 +23,9 @@ public class FractureObject : MonoBehaviour
     List<ContactPoint> contactPoints;
 
     Vector3 normal;
+    Vector3 impulse = Vector3.zero;
+
+    float force;
 
     // Start is called before the first frame update
     void Start()
@@ -144,7 +147,7 @@ public class FractureObject : MonoBehaviour
             {
                 if (collider.transform.parent == transform)
                 {
-                    collider.GetComponent<Rigidbody>().velocity += impulse;
+                    collider.GetComponent<Rigidbody>().AddForceAtPosition(impulse, contact.point);
                 }
             }
         }
@@ -165,29 +168,26 @@ public class FractureObject : MonoBehaviour
             l_normal += point.normal;
 
         normal = l_normal;
-    }
-
-    private void OnCollisionStay(Collision collision)
-    {
-
-        Vector3 impulse = Vector3.zero;
 
         FractureObject otherObject = collision.gameObject.GetComponent<FractureObject>();
         if (otherObject)
         {
-            impulse = (mass + otherObject.mass) * collision.relativeVelocity;
+            impulse = otherObject.mass * collision.relativeVelocity;
         }
         else if (collision.rigidbody && GetComponent<Rigidbody>())
         {
-            impulse = (mass + collision.rigidbody.mass) * collision.relativeVelocity;
+            impulse = collision.rigidbody.mass * collision.relativeVelocity;
         }
         else
         {
             impulse = mass * collision.relativeVelocity;
         }
+        
+        force = (impulse * Vector3.Dot(impulse.normalized, normal.normalized)).magnitude;
+    }
 
-        float force = (impulse * Vector3.Dot(impulse.normalized, normal.normalized) / Time.fixedDeltaTime).magnitude;
-
+    private void OnCollisionStay(Collision collision)
+    {
         if (force >= jointBreakForce)
         {
             contactPoints = new List<ContactPoint>();

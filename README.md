@@ -12,5 +12,6 @@ It uses NVIDIA Blast wrapper for unity as base from [here](https://forum.unity.c
 **[C]** - critical issue, **[NC]** - non-critical issue, **[F]** - feature
 
 - **[C]** Fix physical stability issue, probably related to the centers of masses (can be noticed on round objects like sphere)
+- **[F]** Distribute mass along chunks with taking their size in account
 - **[F]** If FractureObject had any joints attached and it was then fractured, make corresponding joints at the chunk(s) to the same connected body
 - **[F]** Mesh deformation system
