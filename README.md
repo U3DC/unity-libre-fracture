@@ -7,6 +7,8 @@ It uses NVIDIA Blast wrapper for unity as base from [here](https://forum.unity.c
 
 [YouTube Video Demonstration](https://www.youtube.com/watch?v=_vSFzkecSak)
 
+[Usage Tutorial](https://www.youtube.com/watch?v=od1mtc1HcUM)
+
 # TODO
 
 **[C]** - critical issue, **[NC]** - non-critical issue, **[F]** - feature
