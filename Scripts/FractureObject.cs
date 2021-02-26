@@ -124,6 +124,9 @@ public class FractureObject : MonoBehaviour
     void ActivateFracture(Vector3 impulse)
     {
         Destroy(GetComponent<MeshFilter>());
+
+        Destroy(GetComponent<UnityEngine.ProBuilder.ProBuilderMesh>()); // Remove this line if you don't have and aren't going to have ProBuilder installed
+
         Destroy(GetComponent<MeshRenderer>());
         Destroy(GetComponent<ConstantForce>());
         Destroy(GetComponent<Rigidbody>());

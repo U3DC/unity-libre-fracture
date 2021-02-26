@@ -85,7 +85,13 @@ public class CEditorFracture : EditorWindow
         if (GUILayout.Button("Clean Up Objects")) CleanUp(true);
 
         GUILayout.Space(20);
+
+        EditorGUI.BeginChangeCheck();
         source = EditorGUILayout.ObjectField("Source", source, typeof(GameObject), true) as GameObject;
+        if (EditorGUI.EndChangeCheck())
+        {
+            CleanUp(true);
+        }
 
         if (GUILayout.Button("Set selected object as Source") && Selection.activeGameObject != null)
         {
@@ -94,6 +100,8 @@ public class CEditorFracture : EditorWindow
             {
                 if (Selection.activeGameObject.GetComponent<MeshFilter>() != null)
                 {
+                    CleanUp(false);
+
                     source = Selection.activeGameObject;
 
                     if (source.activeInHierarchy)
@@ -568,10 +576,12 @@ public class CEditorFracture : EditorWindow
 
     private void CleanUp(bool enableSource)
     {
-        source.SetActive(enableSource);
+        if(source)
+            source.SetActive(enableSource);
 
         GameObject.DestroyImmediate(GameObject.Find("POINTS"));
-        GameObject.DestroyImmediate(GameObject.Find($"{source.name}{objectPostfix}Preview"));
+        if (source)
+            GameObject.DestroyImmediate(GameObject.Find($"{source.name}{objectPostfix}Preview"));
     }
 
     private void UpdatePreview()
