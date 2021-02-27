@@ -86,10 +86,10 @@ public class ChunkRuntimeInfo : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if(collision.relativeVelocity.magnitude >= fractureObject.chunkCollisionVelocityToCreateVFX)
-        {
-            if(fractureObject.onChunkCollideVFX)
-                Instantiate(fractureObject.onChunkCollideVFX);
-        }
+        //if(collision.relativeVelocity.magnitude >= fractureObject.chunkCollisionVelocityToCreateVFX)
+        //{
+        //    if(fractureObject.onChunkCollideVFX)
+        //        Instantiate(fractureObject.onChunkCollideVFX);
+        //}
     }
 }

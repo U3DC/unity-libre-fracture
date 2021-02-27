@@ -13,17 +13,23 @@ public class FractureObject : MonoBehaviour
     public AudioClip onFractureSound;
     public GameObject onFractureVFX;
 
-    public AudioClip onChunkCollideSound;
-    public GameObject onChunkCollideVFX;
+    public AudioClip onBreakSound;
+
+    //public AudioClip onChunkCollideSound;
+    //public GameObject onChunkCollideVFX;
 
     public float chunkCollisionVelocityToCreateVFX = 5;
 
     bool fractureInitialized = false;
+    bool fractureActivated = false;
 
     List<ContactPoint> contactPoints;
 
     Vector3 normal;
     Vector3 impulse = Vector3.zero;
+
+    bool hasPreservedCollidedObjectVelocity;
+    Vector3 preservedCollidedObjectVelocity = Vector3.positiveInfinity;
 
     float force;
 
@@ -137,6 +143,7 @@ public class FractureObject : MonoBehaviour
         foreach (ChunkRuntimeInfo chunk in chunks)
         {
             chunk.gameObject.SetActive(true);
+            chunk.GetComponent<MeshRenderer>().enabled = true;
         }
 
         
@@ -159,6 +166,7 @@ public class FractureObject : MonoBehaviour
         {
             chunk.gameObject.layer = LayerMask.NameToLayer("Fracture");
         }
+        fractureActivated = true;
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -180,6 +188,8 @@ public class FractureObject : MonoBehaviour
         else if (collision.rigidbody && GetComponent<Rigidbody>())
         {
             impulse = collision.rigidbody.mass * collision.relativeVelocity;
+            preservedCollidedObjectVelocity = collision.rigidbody.velocity;
+            hasPreservedCollidedObjectVelocity = true;
         }
         else
         {
@@ -196,6 +206,15 @@ public class FractureObject : MonoBehaviour
             contactPoints = new List<ContactPoint>();
             collision.GetContacts(contactPoints);
             ActivateFracture(impulse);
+
+            if (onBreakSound)
+                if(!GetComponent<AudioSource>())
+                    AudioSource.PlayClipAtPoint(onBreakSound, transform.position);
+                else
+                    GetComponent<AudioSource>().PlayOneShot(onBreakSound);
+
+            if (collision.rigidbody && hasPreservedCollidedObjectVelocity)
+                collision.rigidbody.velocity = preservedCollidedObjectVelocity;
         }
     }
 

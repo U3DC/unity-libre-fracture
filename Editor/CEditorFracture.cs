@@ -45,6 +45,7 @@ public class CEditorFracture : EditorWindow
 
     public float objectMass = 100;
     public float jointBreakForce = 1000;
+    public AudioClip onBreakSound;
     public uint VHACDResolution = 100000;
 
     //TODO: serialize
@@ -157,8 +158,9 @@ public class CEditorFracture : EditorWindow
 
         VHACDResolution = (uint)EditorGUILayout.IntSlider(new GUIContent("VHACD Resolution"), (int)VHACDResolution, 100000, 64000000);
 
-        EditorGUILayout.Space(5);
+        EditorGUILayout.Space(10);
 
+        onBreakSound = (AudioClip)EditorGUILayout.ObjectField("On Break Sound", onBreakSound, typeof(AudioClip), false);
         objectMass = EditorGUILayout.FloatField("Object Mass", objectMass);
         jointBreakForce = EditorGUILayout.FloatField("Joint Break Force", jointBreakForce);
 
@@ -323,7 +325,10 @@ public class CEditorFracture : EditorWindow
             for (int i = 0; i < cs.transform.childCount; i++)
             {
                 Transform chunk = cs.transform.GetChild(i);
+                chunk.gameObject.layer = LayerMask.NameToLayer("Fracture");
                 Bounds chunkBounds = new Bounds(chunk.GetComponent<MeshRenderer>().bounds.center, chunk.GetComponent<MeshRenderer>().bounds.size * 1.5f);
+
+                chunk.GetComponent<MeshRenderer>().enabled = false;
 
                 ChunkRuntimeInfo chunkInfo = chunk.gameObject.AddComponent<ChunkRuntimeInfo>();
             }
