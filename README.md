@@ -9,6 +9,8 @@ It uses NVIDIA Blast wrapper for unity as base from [here](https://forum.unity.c
 
 [Usage Tutorial](https://www.youtube.com/watch?v=od1mtc1HcUM)
 
+### Unity Libre Fracture is now part of Verein Community. To preserve the accessibility of the repository from the resources where it was already mentioned, I won't transfer it to Verein Community (at least not yet)
+
 # TODO
 
 **[C]** - critical issue, **[NC]** - non-critical issue, **[F]** - feature
